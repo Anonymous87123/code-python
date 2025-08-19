@@ -1,7 +1,1 @@
-name = "I am haizaigahei, %s"%("and you?")
-print(name)
-name = "I am haizaigahei%s"%(123)
-print(name)
-int_num = int(3.1415926)
-name = "I am haizaigahei%x"%(int_num)
-print(name)
+
