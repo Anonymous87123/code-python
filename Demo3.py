@@ -1,7 +1,7 @@
-print("打折活动火热进行中...")
-x=input("请用数字回答今天是星期几？你的回答是：")
-y=int(input("请用数字回答现在几点了？(24小时制),你的回答是："))
-if (x==2 and (y>=19 and y<=20)) or (x==3 and (y>=19 and y<=20)):
-    print("恭喜你获得10%的折扣！")
-else:
-    print("折扣活动未开始或已结束，不享受折扣。")
+name = "I am haizaigahei, %s"%("and you?")
+print(name)
+name = "I am haizaigahei%s"%(123)
+print(name)
+int_num = int(3.1415926)
+name = "I am haizaigahei%x"%(int_num)
+print(name)
