@@ -33,5 +33,5 @@ if (x==2 and (y>=19 and y<=20)) or (x==3 and (y>=19 and y<=20)):
 else:
     print("折扣活动未开始或已结束，不享受折扣。")
 
-name= '\'还在尬黑\''
+name= '\'还在尬黑 %s\''%("那么你呢")
 print(name)
