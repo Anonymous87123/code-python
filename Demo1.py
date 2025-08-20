@@ -43,3 +43,18 @@ int_num = int(3.1415926)
 name = "I am haizaigahei%x"%(int_num)
 print(name)
 
+name = "haizaigahei"
+avg_salary = 50000
+message = "I am %s, the average salary of my company is %d"%(name,avg_salary)
+print(message)
+
+name = "haizaigahei"
+year = 2021
+price = 3.13
+message = "my name is %s,and I am %d years old, and the price is %f dollars" %(name, year, price)
+print(message)
+
+num1 = 11.345
+name = "John"
+message = "hello，I am %s,my favorite number is %.2f "%(name,num1)
+print(message)
