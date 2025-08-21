@@ -56,5 +56,9 @@ print(message)
 
 num1 = 11.345
 name = "John"
-message = "hello，I am %s,my favorite number is %.2f "%(name,num1)
+message = "hello,I am %s,my favorite number is %.2f "%(name,num1)
 print(message)
+
+name = "John"
+age = 25
+print(f"my name is {name},and my age is {age}")
