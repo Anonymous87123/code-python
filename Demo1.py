@@ -62,3 +62,14 @@ print(message)
 name = "John"
 age = 25
 print(f"my name is {name},and my age is {age}")
+
+sum=1+1
+print("1+1= %d"%(sum))
+print(f"1+1={1+1}")
+print("字符串在python中的类型是%s"%(type("字符串")))
+
+name = "张三"
+age = 25
+print("我的名字是%s，今年%d岁。"%(name,age))
+
+print(f"字符串的类型是{type('字符串')}")
