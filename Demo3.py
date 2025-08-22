@@ -1,10 +1,22 @@
-time = input("填数字,如1，2，3,现在给出数字：")
-time1 = int(time)
-name = "宇强传媒"
-stock_price = 19.99
-stock_code = "000001" 
-factor = 1.1
-result1 = factor ** time1
-result2 = stock_price*result1
-print(f"{name}当前的股价为{stock_price}元")
-print(f"{time}天后，{name},即股票代号{stock_code}的股价将会涨到{result2:.6}元")
+print("礼物派送中，满足条件即可领取：")
+age = int(input("Enter your age: "))
+if age >= 18 and age <= 60:
+    print("你是成年人了，符合年龄要求")
+    if int(input("Enter your work years: ")) >= 3: 
+        print("你工作经验符合要求")
+        print("恭喜你获得礼物")
+    else:
+        print("你工作经验不足，接下来验证您的级别")    
+        if int(input("Enter your working status: ")) >=3:
+            print("你的级别达标，符合礼物派送要求")
+        elif ValueError:
+            print("输入有误，请重新输入")
+        else:
+            print("你还未达到领取条件")
+elif age < 18:
+    print("你未满18岁，不符合领取条件") 
+elif age > 60:
+    print("你超过60岁，不符合领取条件") 
+elif ValueError:
+    print("输入有误，请重新输入")
+

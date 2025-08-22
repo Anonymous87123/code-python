@@ -73,3 +73,24 @@ age = 25
 print("我的名字是%s，今年%d岁。"%(name,age))
 
 print(f"字符串的类型是{type('字符串')}")
+
+time = input("填数字,如1，2，3,现在给出数字：")
+time1 = int(time)
+name = "宇强传媒"
+stock_price = 19.99
+stock_code = "000001" 
+factor = 1.1
+result1 = factor ** time1
+result2 = stock_price*result1
+print(f"{name}当前的股价为{stock_price}元")
+print(f"{time}天后,{name},即股票代号{stock_code}的股价将会涨到{result2:.6}元")
+
+if int(input("你的身高是多少厘米："))>=120:
+    print("对不起，您的身高不符合免费要求。")
+    print("but if you have vip, you can enjoy for free too")
+    if int(input("是否有会员？（1是，0否）"))==1:
+        print("恭喜您，您已获得免费特权！")
+    else:
+        print("抱歉，您没有会员资格。")
+else:
+    print("恭喜您，您的身高符合免费要求。")
