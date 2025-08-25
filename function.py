@@ -79,16 +79,21 @@ def sum():
             print("first number error, please enter a valid number")
             continue
         #这个continue的含义是如果try中的语句出错，则直接跳过后面的语句，重新执行while循环
-        #想像一下，你打篮球完了之后就吃饭，然后没投中，这个时候你就得“继续”打，而不是直接结束程序
-        num_input4 = input("Enter second number: ")
-        try:
-            num4 = float(num_input4)
-        except ValueError:
-            print("second number error, please enter a valid number")
-            continue
-        add = num3 + num4
-        print(f"{num3}+{num4}={add}")
-        break#这个break的含义是，如果try中的语句没有出错，则直接跳出while循环，结束函数的执行
-sum()
+        #想像一下，你打篮球完了之后就吃饭，然后没投中，这个时候你就得“继续”打，而不是直接结束
+        while True:
+            num_input4 = input("Enter second number: ")
+            try:
+                num4 = float(num_input4)
+                sum = num3 + num4
+                print(f"{num3}+{num4}={sum}")
+                return sum
+                break
+            except ValueError:
+                print("second number error, please enter a valid number")
+                continue
+result = sum()
+print(result)
 
-    
+
+
+
