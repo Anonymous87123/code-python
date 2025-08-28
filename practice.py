@@ -101,3 +101,18 @@ while i <= 1000:
     sum += i
     i += 1
 print("The sum of first 100 natural numbers is:", sum)
+
+def f():
+    i = 0
+    j = 0
+    print(f"a_1 = 0")
+    while True:
+        i = i**2 + 1
+        j += 1
+        print(f"a_{j}={i}")
+        choose= input("请选择是否计算下一项,输入1继续，输入其他字符退出：")
+        if choose == "1":
+            continue
+        else:
+            break
+f()

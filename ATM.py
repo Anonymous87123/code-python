@@ -49,6 +49,9 @@ def mian():
                         elif choice == 3:
                             withdraw()
                             mian()
+                        else:
+                            print("请重新输入")
+                            continue
                     except ValueError:
                         print("请重新输入")
                         continue
@@ -61,6 +64,9 @@ def mian():
                             exit()
                         elif choose == 2:
                             mian()
+                        else:
+                            print("请重新输入")
+                            continue
                     except ValueError:
                         print("请重新输入")
                         continue
