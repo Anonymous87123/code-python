@@ -1,2 +1,2 @@
-import my_package.my_module1 as mm
+import my_utils.str_util as mm
 mm.my_function1()
