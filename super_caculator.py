@@ -6,7 +6,7 @@ class Calculator:
         self.master = master
         self.result_var = tk.StringVar()
         self.master.title("Super Calculator")
-        self.display = tk.Entry(master, textvariable=self.result_var, font=("Arial", 24), bd=10, insertwidth=4, width=14, borderwidth=4)
+        self.display = tk.Entry(master, textvariable=self.result_var, font=("Arial", 24),  insertwidth=4, width=20, borderwidth=10)
         self.display.grid(row=0, column=0, columnspan=4)
         self.create_buttons()  # 修复方法名
     
@@ -17,7 +17,7 @@ class Calculator:
             ('1', 3, 0), ('2', 3, 1), ('3', 3, 2), ('-', 3, 3),
             ('0', 4, 0), ('.', 4, 1), ('+', 4, 2), ('=', 4, 3),
             ('√', 5, 0), ('^2', 5, 1), ('C', 5, 2), ('求整', 5, 3),
-            ('求余', 6, 0)
+            ('求余', 6,0)
         ]
         for (text, row, col) in buttons:
             button = tk.Button(self.master, text=text, padx=20, pady=20, width=5, height=2, 
