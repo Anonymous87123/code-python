@@ -1,39 +1,49 @@
+'''
+代码说明：构建逻辑如下：
+首先创建一个类,类名为SuperCalculator24,包含两个方法:
+1. __init__(self, root)：初始化方法，创建窗口，创建输入框，创建历史记录文件，创建特殊字符串变量.input_frame在第 0 行（最上面）,result_frame在第 1 行（中间）,button_frame在第 2 行（最下面）
+2. calculate(self)：计算方法，读取输入框的值，进行运算，显示结果，记录历史记录
+然后在__init__方法中创建窗口,窗口标题为“Super Calculator '24' point”,窗口大小为500x800,背景色为浅灰色。
+创建输入框框架,包含4个输入框,分别表示第1、2、3、4个数,输入框的字体大小为18,边框宽度为3,边框样式为凹陷效果。
+创建历史记录文件,文件名为calculator_history.json,如果文件不存在,则创建。
+创建特殊字符串变量，分别表示输入框的值。
+在calculate方法中,读取输入框的值，进行运算，显示结果，并记录历史记录。
+最后在__init__方法中调用calculate方法,实现计算功能。
+'''
 import tkinter as tk
 import datetime
 import json
 import os
-
 class SuperCalculator24:
     def __init__(self, root):
         self.root = root
         self.root.title("Super Calculator '24' point")
         self.root.geometry("500x800")  # 增加窗口宽度
         self.root.configure(bg="#f0f0f0")
-        
+        # configure 是设置窗口的属性，bg是背景色，这里设置为浅灰色
         # 创建历史记录文件
         self.history_file = "calculator_history.json"
         self.history = self.load_history()
-        
         # 创建特殊字符串变量
         self.input_var1 = tk.StringVar()
         self.input_var2 = tk.StringVar()
         self.input_var3 = tk.StringVar()
         self.input_var4 = tk.StringVar()
-        
         # 创建主框架
         main_frame = tk.Frame(self.root, bg="#f0f0f0")
         main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
-        
+        # pack()方法是用来控制窗口的布局的，fill=tk.BOTH表示填充整个窗口
+        # expand=True表示窗口可以自动适应大小，padx和pady是窗口的边距
         # 输入框框架
         input_frame = tk.Frame(main_frame, bg="#f0f0f0")
         input_frame.grid(row=0, column=0, columnspan=4, pady=10, sticky='nsew')      
-        
+        # grid()方法是用来控制窗口的位置的，row=0表示在第0行，column=0表示在第0列，columnspan=4表示占4列
         # 添加输入框指引标签
         guide = "认为J,Q,K分别是11,12,13"
         tk.Label(input_frame, text=f"第1个数,{guide}:", font=("Arial", 14), bg="#f0f0f0").grid(row=0, column=0, padx=5, pady=5, sticky='e')
         self.display1 = tk.Entry(input_frame, textvariable=self.input_var1, font=("Arial", 18), width=15, bd=3, relief=tk.SUNKEN)
         self.display1.grid(row=0, column=1, columnspan=3, pady=5, sticky='we')
-        
+        # relief用来设置边框样式，tk.SUNKEN表示凹陷效果，bd用来设置边框宽度
         tk.Label(input_frame, text=f"第2个数,{guide}:", font=("Arial", 14), bg="#f0f0f0").grid(row=1, column=0, padx=5, pady=5, sticky='e')
         self.display2 = tk.Entry(input_frame, textvariable=self.input_var2, font=("Arial", 18), width=15, bd=3, relief=tk.SUNKEN)
         self.display2.grid(row=1, column=1, columnspan=3, pady=5, sticky='we')
@@ -91,7 +101,7 @@ class SuperCalculator24:
         button_frame.grid(row=2, column=0, columnspan=4, pady=10)
         self.create_buttons(button_frame)
         
-        # 配置权重
+        # 配置权重,rowconfigure和columnconfigure用来设置窗口的行和列的权重，使窗口可以自动调整大小,weight=1表示权重为1
         main_frame.grid_rowconfigure(1, weight=1)
         for i in range(4):
             main_frame.grid_columnconfigure(i, weight=1)
@@ -163,53 +173,52 @@ class SuperCalculator24:
             bg=history_bg, fg=history_fg, width=10
         ).grid(columnspan=3, pady=5)
     
-    def load_history(self):
-        """加载历史记录"""
-        if os.path.exists(self.history_file):
-            try:
-                with open(self.history_file, 'r') as f:
-                    return json.load(f)
-            except:
-                return []
-        return []
+    def load_history(self):#加载历史记录
+        if os.path.exists(self.history_file):#如果历史记录文件存在
+            try:#尝试打开并读取文件
+                with open(self.history_file, 'r') as f:#以只读模式打开历史记录文件
+                    return json.load(f)#读取文件内容并返回
+            except:#如果读取失败（文件损坏等）
+                return []#返回空列表
+        return []#如果文件不存在，返回空列表
     
-    def save_history(self):
-        """保存历史记录"""
-        with open(self.history_file, 'w') as f:
-            json.dump(self.history, f, indent=2)
+    def save_history(self):#保存历史记录
+        with open(self.history_file, 'w') as f:#以写入模式打开历史记录文件
+            json.dump(self.history, f, indent=2)#将历史记录列表以 JSON 格式写入文件
+            #indent=2表示使用 2 个空格缩进，使文件更易读
     
-    def add_to_history(self, numbers, solutions):
-        """添加记录到历史"""
+    def add_to_history(self, numbers, solutions):#添加记录到历史
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        entry = {
+        #获取当前时间并格式化为字符串,获取当前精确到微秒的时间戳
+        #datetime是 Python 的标准库模块，用于处理日期和时间
+        #datetime.datetime是 datetime模块中的一个类，表示特定的日期和时间
+        #now()是 datetime.datetime类的一个静态方法，返回当前的本地日期和时间
+        #strftime()是 datetime.datetime类的一个方法，用于格式化日期和时间
+        #将其格式化为 年-月-日 时:分:秒的字符串
+        entry = {#创建历史记录条目字典，包含：时间戳、输入数字、解法
             "timestamp": timestamp,
             "numbers": numbers,
             "solutions": solutions
         }
-        self.history.append(entry)
-        self.save_history()
-    
-    def show_history(self):
-        """显示历史记录窗口"""
-        history_window = tk.Toplevel(self.root)
-        history_window.title("计算历史记录")
-        history_window.geometry("800x600")  # 增加历史记录窗口尺寸
+        self.history.append(entry)#将新条目添加到历史记录列表
+        self.save_history()#保存更新后的历史记录
+    def show_history(self):#显示历史记录窗口
+        history_window = tk.Toplevel(self.root)#创建新的顶级窗口
+        history_window.title("计算历史记录")#设置窗口标题
+        history_window.geometry("800x600")  # 历史记录窗口尺寸和背景颜色
         history_window.configure(bg="#f0f0f0")
         
         # 标题
         tk.Label(history_window, text="历史记录", font=("Arial", 16, "bold"), bg="#f0f0f0").pack(pady=10)
-        
         # 历史记录框架
         history_frame = tk.Frame(history_window, bg="#f0f0f0")
         history_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
         # 滚动条
         v_scrollbar = tk.Scrollbar(history_frame)
         v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
         h_scrollbar = tk.Scrollbar(history_frame, orient=tk.HORIZONTAL)
+        #orient=tk.HORIZONTAL- 设置水平方向
         h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
-        
         # 历史记录文本区域 - 增加宽度
         history_text = tk.Text(
             history_frame, 
@@ -217,9 +226,9 @@ class SuperCalculator24:
             width=90,  # 增加宽度
             font=("Arial", 12),
             wrap=tk.NONE,  # 不自动换行，允许水平滚动
-            xscrollcommand=h_scrollbar.set,
-            yscrollcommand=v_scrollbar.set,
-            state=tk.NORMAL,
+            xscrollcommand=h_scrollbar.set,#连接水平滚动条
+            yscrollcommand=v_scrollbar.set,#连接垂直滚动条
+            state=tk.NORMAL,#设置为可编辑状态
             bd=2,
             relief=tk.SUNKEN,
             bg="white"
@@ -234,18 +243,18 @@ class SuperCalculator24:
         if not self.history:
             history_text.insert(tk.END, "暂无历史记录")
         else:
-            for i, entry in enumerate(reversed(self.history), 1):
+            for i, entry in enumerate(reversed(self.history), 1):#遍历历史记录列表，逆序
                 history_text.insert(tk.END, f"记录 {i}: {entry['timestamp']}\n")
                 history_text.insert(tk.END, f"输入数字: {entry['numbers']}\n")
                 history_text.insert(tk.END, f"解法 ({len(entry['solutions'])}种):\n")
                 
-                for j, solution in enumerate(entry['solutions'], 1):
+                for j, solution in enumerate(entry['solutions'], 1):#遍历解法列表
                     expression = self.format_solution(solution)
                     history_text.insert(tk.END, f"  {j}. {expression} = 24\n")
                 
-                history_text.insert(tk.END, "-" * 100 + "\n\n")  # 增加分隔线长度
+                history_text.insert(tk.END, "-" * 100 + "\n\n")  # 设置分隔线长度
         
-        history_text.config(state=tk.DISABLED)
+        history_text.config(state=tk.DISABLED)#禁用文本编辑，使其只读
         
         # 清除历史按钮
         clear_button = tk.Button(
@@ -259,8 +268,7 @@ class SuperCalculator24:
         )
         clear_button.pack(pady=10)
     
-    def format_solution(self, solution):
-        """格式化解法为可读字符串"""
+    def format_solution(self, solution):#这段代码将内部表示的解​​法格式化为可读的数学表达式​​
         nums, ops, pattern = solution
         if pattern == "((a op b) op c) op d":
             return f"(({nums[0]} {ops[0]} {nums[1]}) {ops[1]} {nums[2]}) {ops[2]} {nums[3]}"
