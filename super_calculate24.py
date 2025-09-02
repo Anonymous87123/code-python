@@ -3,7 +3,7 @@ class SuperCalculator24:
     def __init__(self, root):
         self.root = root
         self.root.title("Super Calculator '24' point")
-        self.root.geometry("650x750")# 设置窗口大小,单位是像素,一个像素的边长约为0.22mm
+        self.root.geometry("450x750")# 设置窗口大小,单位是像素,一个像素的边长约为0.22mm
         # 创建特殊字符串变量,它们与Entry小部件绑定,用于存储输入的数字,同步显示
         self.input_var1 = tk.StringVar()
         self.input_var2 = tk.StringVar()
