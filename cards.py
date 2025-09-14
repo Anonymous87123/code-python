@@ -1,264 +1,243 @@
 import random
 ordinary_card = ['3','4','5','6','7','8','9','10','J','Q','K','A','2']
 special_card = ['小王','大王']
+card_value = {
+    '3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':15,'小王':16,'大王':17
+}#创建映射字典
 def create_poker():
-    poker = []
+    poker = []#创建列表用来容纳扑克牌
     for i in ordinary_card:
         poker.append(i), poker.append(i),poker.append(i),poker.append(i)
+        #普通牌各有4张
     for i in special_card:
-        poker.append(i)
+        poker.append(i)#大小王各有1张
     return poker
-def shuffle_poker(poker):
+def shuffle_poker(poker):#洗牌
     random.shuffle(poker)
     return poker
 def deal_poker(poker):
     player1 = []
     player2 = []
     player3 = []
-    remain_card = []
-    for i in range(52):
-        i_reflect= poker[i]
-        if i_reflect < 17:
+    remain_card = []#地主牌
+    for i in range(51):
+        i_reflect= poker[i]#对应到poker列表中的索引
+        #按顺序分发牌，每3张一组，避免洗牌不干净
+        if i%3 == 0:
             player1.append(i_reflect)
-        elif i_reflect < 34:
+        elif i%3 == 1:
             player2.append(i_reflect)
-        elif i_reflect < 51:
+        elif i%3 == 2:
             player3.append(i_reflect)
-        else:
-            remain_card.append(i_reflect)
+    for i in range(51,len(poker)):#剩余3张地主牌
+        remain_card.append(poker[i])
     return (player1,player2,player3,remain_card)
-def sort_poker(poker):
+def sort(cards):#冒泡排序
+    for i in range(len(cards)):
+        for j in range(i+1,len(cards)):
+            if card_value[cards[i]]>card_value[cards[j]]:
+                cards[i],cards[j] = cards[j],cards[i]
+    return cards
+def sort_poker():#自动给三家的牌以及地主牌排序
     poker = create_poker()
     poker = shuffle_poker(poker)
     player1,player2,player3,remain_card = deal_poker(poker)
-    for i in range(len(player1)):
-        for j in range(i+1,len(player1)):
-            if player1[i] > player1[j]:
-                player1[i],player1[j] = player1[j],player1[i]
-                return player1
-    for i in range(len(player2)):
-        for j in range(i+1,len(player2)):
-            if player2[i] > player2[j]:
-                player2[i],player2[j] = player2[j],player2[i]
-                return player2
-    for i in range(len(player3)):
-        for j in range(i+1,len(player3)):
-            if player3[i] > player3[j]:
-                player3[i],player3[j] = player3[j],player3[i]
-                return player3
-
-sort_poker()
-card_value = {
-    '3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':15,'小王':16,'大王':17
-}
-def get_card_value(cards):
-    if cards is None or len(cards) == 0:
-        return(None,None,None)
-    values = []#存储并记录每张牌的点数
+    player1_sort = sort(player1)
+    player2_sort = sort(player2)
+    player3_sort = sort(player3)
+    remain_card_sort = sort(remain_card)
+    return (player1_sort,player2_sort,player3_sort,remain_card_sort)
+def get_card_value(cards):#识别牌型
+    if cards is None or len(cards) == 0:#判断如果不出牌
+        return (None, None, None)
+    values = []#为每一轮的出牌创建副本用来判断牌型
     for card in cards:
         if card in card_value:
             values.append(card_value[card])
         else:
             return None
     n = len(values)
-    for i in range(n):#给牌手动排序
-        for j in range(i+1,n):
-            if values[i] > values[j]:
-                values[i],values[j] = values[j],values[i]
-    count_map= {}#创建空字典，用于统计每一种牌的数量
-    for value in values:
+    values_sorted = sorted(values)
+    count_map = {}
+    for value in values_sorted:
         if value in count_map:
             count_map[value] += 1
         else:
             count_map[value] = 1
     
-    # 修正王炸判断条件
-    if n == 2 and 16 in values and 17 in values:
-        return('Rocket',17,None)
+    # 火箭（王炸）
+    if n == 2 and 16 in values_sorted and 17 in values_sorted:
+        return ('Rocket', 17, None)
     
+    # 单张
     if n == 1:
-        return('Single',values[-1],None)
+        return ('Single', values_sorted[0], None)
     
+    # 对子
     if n == 2:
-        if len(count_map)== 1:#判断是否有对子
-            return('Pair',values[-1],None)
-        else:
-            return None
+        if len(count_map) == 1:
+            return ('Pair', values_sorted[0], None)
     
+    # 三张
     if n == 3:
-        if len(count_map) == 1:#判断是否有三条
-            return('triplet',values[-1],None)
-        else:
-            return None
+        if len(count_map) == 1:
+            return ('triplet', values_sorted[0], None)
     
-    if n == 4:
-        if len(count_map) == 1:#判断是否有炸弹
-            return('Bomb',values[-1],None)
-        elif len(count_map) == 2:#判断是否有三带一
-            for value in count_map:
-                if count_map[value] == 3:
-                    key = value
-                    return('triplet_with_single',key,None)
-            return None
-        else:
-            return None
-    
-    if n == 5:
-        if len(count_map) == 2:#判断是否有三带一对
-            for value in count_map:
-                if count_map[value] == 3:
-                    key = value
-                    for other_value in count_map:
-                        if other_value != value and count_map[other_value] == 2:
-                            return('triplet_with_pair',key,None)
-            return None
-        else:
-            return None
-    
-    if n >= 5:#判断是否有顺子
-        is_sequence = True#判断是否连续
-        if len(count_map) != n:
-            is_sequence = False
-        else:
-            for i in range(n-1):
-                if values[i+1] != values[i]+1:
-                    is_sequence = False
-                    break
-            for value in values:
-                if value >= 15:#判断是否有2或者王牌
-                    is_sequence = False
-                    break
-        if is_sequence:
-            return('Sequence',values[-1],n)
-        else:
-            return None
-    
-    if n >= 6 and n % 2 == 0:#判断是否有连对
-        pairs = []
-        for value in count_map:
-            if count_map[value] == 2:
-                pairs.append(value)
-        for i in range(len(pairs)):
-            for j in range(i+1,len(pairs)):
-                if pairs[i]>pairs[j]:
-                    pairs[i],pairs[j] = pairs[j],pairs[i]
-        is_pair = True
-        if len(pairs)*2 != n:#不是所有的牌都组合成对子
-            is_pair = False
-        elif len(pairs) < 3:
-            is_pair = False
-        else:#检查是否连续#检查是否出现2或王牌
-            for i in range(len(pairs)-1):
-                if pairs[i+1] != pairs[i]+1:
-                    is_pair = False
-                    break
-            for value in pairs:
-                if value >= 15:
-                    is_pair = False
-                    break
-        if is_pair:
-            return('Pair_Sequence',pairs[-1],len(pairs))
-    
-    if n >= 6:
-        triplets = []
-        for value in count_map:
-            if count_map[value] == 3:
-                triplets.append(value)
-        for i in range(len(triplets)):
-            for j in range(i+1,len(triplets)):
-                if triplets[i]>triplets[j]:
-                    triplets[i],triplets[j] = triplets[j],triplets[i]
-        is_air_plane = True
-        if len(triplets) <= 1:
-            is_air_plane = False
-        else:
-            for i in range(len(triplets)-1):
-                if triplets[i+1] != triplets[i]+1:
-                    is_air_plane = False
-                    break
-        if is_air_plane:#获取其他牌
-            other_cards=[]
-            for value in values:
-                if value not in triplets or values.count(value) > 3:
-                    other_cards.append(value)
-            other_count = {}
-            for card in other_cards:
-                if card in other_count:
-                    other_count[card] += 1
-                else:
-                    other_count[card] = 1
-            if not other_cards:
-                return('airplane',triplets[-1],len(triplets))
-            elif len(other_cards) == len(triplets):
-                all_single = True
-                for count in other_count.values():
-                    if count != 1:
-                        all_single = False
-                        break
-                if all_single:
-                    return('airplane_with_single',triplets[-1],len(triplets))
-            elif len(other_cards) == 2 * len(triplets):
-                all_pair = True
-                for count in other_count.values():
-                    if count != 2:
-                        all_pair = False
-                        break
-                if all_pair:
-                    return('airplane_with_pair',triplets[-1],len(triplets))
-        
-        is_triplet = True
-        if len(triplets)*3 != n:#不是所有的牌都组合成三条
-            is_triplet = False
-        elif len(triplets) < 2:
-            is_triplet = False
-        else:#检查是否出现2或王牌
-            for i in range(len(triplets)-1):
-                if triplets[i+1] != triplets[i]+1:
-                    is_triplet = False
-                    break
-            for value in triplets:
-                if value >= 15:
-                    is_triplet = False
-                    break
-        if is_triplet:
-            return('triplet_sequence',triplets[-1],len(triplets))
-    
-    if n == 6:
-        for value in count_map:
-            if count_map[value] == 4:
-                key = value
-                other_cards=[]
-                for card in values:
-                    if card != value:
-                        other_cards.append(card)
-                if len(set(other_cards))==2:
-                    return('quad_with_two_singles',value,None)
-                if len(set(other_cards))==1:
-                    return('quad_with_pair',key,None)
-        return None
-    
-    if n == 8:
-        has_four = False
-        four_value = None
-        rest_counts = []
-        for value in count_map:
-            if count_map[value] == 4:
-                has_four = True
-                four_value = value
-            else:
-                rest_counts.append(count_map[value])
-        if has_four and len(rest_counts) == 2 and all(value == 2 for value in rest_counts):
-            return('four_with_two_pairs',four_value,None)
-        else:
-            return None
-    
+    # 炸弹
     if n == 4 and len(count_map) == 1:
-        return('bomb',values[0],None)
+        return ('Bomb', values_sorted[0], None)
+    
+    # 三带一
+    if n == 4:
+        for value, count in count_map.items():
+            if count == 3:
+                return ('triplet_with_single', value, None)
+    
+    # 三带一对
+    if n == 5:
+        triplet_value = None
+        pair_value = None
+        for value, count in count_map.items():
+            if count == 3:
+                triplet_value = value
+            elif count == 2:
+                pair_value = value
+        if triplet_value and pair_value:
+            return ('triplet_with_pair', triplet_value, None)
+    
+    # 顺子
+    if n >= 5:
+        # 检查是否所有牌都是单张
+        if len(count_map) == n:
+            # 检查是否连续
+            is_sequence = True
+            for i in range(n-1):
+                if values_sorted[i+1] != values_sorted[i] + 1:
+                    is_sequence = False
+                    break
+            # 检查是否有2或王牌
+            if any(value >= 15 for value in values_sorted):
+                is_sequence = False
+            if is_sequence:
+                return ('Sequence', values_sorted[-1], n)
+    
+    # 连对
+    if n >= 6 and n % 2 == 0:
+        pairs = []
+        for value, count in count_map.items():
+            if count == 2:
+                pairs.append(value)
+        if len(pairs) * 2 != n:  # 不是所有牌都是对子
+            pass
+        elif len(pairs) >= 3:  # 连对至少需要3对
+            pairs_sorted = sorted(pairs)
+            is_pair_sequence = True
+            # 检查连续性
+            for i in range(len(pairs_sorted)-1):
+                if pairs_sorted[i+1] != pairs_sorted[i] + 1:
+                    is_pair_sequence = False
+                    break
+            # 检查是否有2或王牌
+            if any(value >= 15 for value in pairs_sorted):
+                is_pair_sequence = False
+            if is_pair_sequence:
+                return ('Pair_Sequence', pairs_sorted[-1], len(pairs_sorted))
+    
+    # 飞机（不带牌）
+    if n % 3 == 0 and n >= 6:
+        triplets = []
+        for value, count in count_map.items():
+            if count == 3:
+                triplets.append(value)
+        if len(triplets) * 3 != n:  # 不是所有牌都是三张
+            pass
+        elif len(triplets) >= 2:  # 飞机至少需要2组
+            triplets_sorted = sorted(triplets)
+            is_airplane = True
+            # 检查连续性
+            for i in range(len(triplets_sorted)-1):
+                if triplets_sorted[i+1] != triplets_sorted[i] + 1:
+                    is_airplane = False
+                    break
+            # 检查是否有2或王牌
+            if any(value >= 15 for value in triplets_sorted):
+                is_airplane = False
+            if is_airplane:
+                return ('airplane', triplets_sorted[-1], len(triplets_sorted))
+    
+    # 飞机带单牌
+    if n % 4 == 0 and n >= 8:  # 8, 12, 16等
+        triplets = []
+        for value, count in count_map.items():
+            if count == 3:
+                triplets.append(value)
+        if len(triplets) < 2:  # 至少需要2组三张
+            pass
+        else:
+            triplets_sorted = sorted(triplets)
+            is_airplane = True
+            # 检查连续性
+            for i in range(len(triplets_sorted)-1):
+                if triplets_sorted[i+1] != triplets_sorted[i] + 1:
+                    is_airplane = False
+                    break
+            # 检查是否有2或王牌
+            if any(value >= 15 for value in triplets_sorted):
+                is_airplane = False
+            if is_airplane:
+                # 检查带牌是否都是单张
+                other_cards = [v for v in values_sorted if v not in triplets_sorted]
+                if len(other_cards) == len(triplets_sorted):
+                    return ('airplane_with_single', triplets_sorted[-1], len(triplets_sorted))
+    
+    # 飞机带对子
+    if n % 5 == 0 and n >= 10:  # 10, 15, 20等
+        triplets = []
+        for value, count in count_map.items():
+            if count == 3:
+                triplets.append(value)
+        if len(triplets) < 2:  # 至少需要2组三张
+            pass
+        else:
+            triplets_sorted = sorted(triplets)
+            is_airplane = True
+            # 检查连续性
+            for i in range(len(triplets_sorted)-1):
+                if triplets_sorted[i+1] != triplets_sorted[i] + 1:
+                    is_airplane = False
+                    break
+            # 检查是否有2或王牌
+            if any(value >= 15 for value in triplets_sorted):
+                is_airplane = False
+            if is_airplane:
+                # 检查带牌是否都是对子
+                other_cards = [v for v in values_sorted if v not in triplets_sorted]
+                other_count_map = {}
+                for v in other_cards:
+                    other_count_map[v] = other_count_map.get(v, 0) + 1
+                if all(count == 2 for count in other_count_map.values()):
+                    return ('airplane_with_pair', triplets_sorted[-1], len(triplets_sorted))
+    
+    # 四带二单
+    if n == 6:
+        for value, count in count_map.items():
+            if count == 4:
+                return ('quad_with_two_singles', value, None)
+    
+    # 四带二对
+    if n == 8:
+        for value, count in count_map.items():
+            if count == 4:
+                # 检查其余4张牌是否组成2对
+                other_values = [v for v in values_sorted if v != value]
+                other_count_map = {}
+                for v in other_values:
+                    other_count_map[v] = other_count_map.get(v, 0) + 1
+                if sum(1 for c in other_count_map.values() if c == 2) == 2:
+                    return ('quad_with_two_pairs', value, None)
     
     return None
-
 def compare_cards(cards1,cards2):
-    # 检查空输入
     if cards1 is None or len(cards1) == 0:
         if cards2 is None or len(cards2) == 0:
             return 0
@@ -267,7 +246,6 @@ def compare_cards(cards1,cards2):
     elif cards2 is None or len(cards2) == 0:
         return 1
     
-    # 获取牌型信息
     result1 = get_card_value(cards1)
     result2 = get_card_value(cards2)
     
@@ -277,7 +255,7 @@ def compare_cards(cards1,cards2):
     type1, key1, extra1 = result1
     type2, key2, extra2 = result2
     
-    if type1 == 'Rocket':#先比王炸
+    if type1 == 'Rocket':
         if type2 == 'Rocket':
             return 0
         else:
@@ -285,7 +263,7 @@ def compare_cards(cards1,cards2):
     elif type2 == 'Rocket':
         return -1
     
-    if type1 == 'Bomb' or type2 == 'Bomb':#先比炸弹
+    if type1 == 'Bomb' or type2 == 'Bomb':
         if type1 == 'Bomb' and type2 == 'Bomb':
             if key1 > key2:
                 return 1
@@ -298,16 +276,14 @@ def compare_cards(cards1,cards2):
         else:
             return -1
     
-    if type1 != type2:#类型不同，无法直接比较
+    if type1 != type2:
         return None
     
-    # 相同类型比较
     if key1 > key2:
         return 1
     elif key1 < key2:
         return -1
     else:
-        # 关键牌相同，比较附加信息（如顺子长度）
         if extra1 is not None and extra2 is not None:
             if extra1 > extra2:
                 return 1
@@ -318,35 +294,206 @@ def compare_cards(cards1,cards2):
         else:
             return 0
 
-def reveal_cards():
-    # 获取用户输入，使用空格分隔每张牌
-    cards1_input = input("请出第一手牌（用空格分隔每张牌，如：3 4 5 6 7）: ")
-    cards2_input = input("请出第二手牌（用空格分隔每张牌，如：8 9 10 J Q）: ")
+def abandon_card(player, card):
+    player.remove(card)
+    return player
+
+def landlord_choose():
+    while True:
+        poker = create_poker()
+        poker = shuffle_poker(poker)
+        player1, player2, player3, remain_card = deal_poker(poker)
+        player1 = sort(player1)
+        player2 = sort(player2)
+        player3 = sort(player3)
+        remain_card = sort(remain_card)
+        
+        scores = [0, 0, 0]
+        landlord_index = -1
+        
+        print("\n玩家1的牌是:", player1)
+        while True:
+            try:
+                choose1 = int(input("玩家1请叫分（0:不叫,1:1分,2:2分,3:3分）: "))
+                if 0 <= choose1 <= 3:
+                    scores[0] = choose1
+                    break
+                else:
+                    print("输入错误，请输入0-3的数字")
+            except:
+                print("输入错误，请输入0-3的数字")
+        
+        if scores[0] == 3:
+            landlord_index = 0
+            print("玩家1叫3分，直接成为地主")
+        else:
+            print(f"玩家1叫分: {scores[0]}分")
+            print("玩家2的牌是:", player2)
+            while True:
+                try:
+                    choose2 = int(input("玩家2请叫分（0:不叫,1:1分,2:2分,3:3分）: "))
+                    if 0 <= choose2 <= 3:
+                        scores[1] = choose2
+                        break
+                    else:
+                        print("输入错误，请输入0-3的数字")
+                except:
+                    print("输入错误，请输入0-3的数字")
+            
+            if scores[1] == 3:
+                landlord_index = 1
+                print("玩家2叫3分，直接成为地主")
+            else:
+                print(f"玩家1叫分: {scores[0]}分, 玩家2叫分: {scores[1]}分")
+                print("玩家3的牌是:", player3)
+                while True:
+                    try:
+                        choose3 = int(input("玩家3请叫分（0:不叫,1:1分,2:2分,3:3分）: "))
+                        if 0 <= choose3 <= 3:
+                            scores[2] = choose3
+                            break
+                        else:
+                            print("输入错误，请输入0-3的数字")
+                    except:
+                        print("输入错误，请输入0-3的数字")
+                
+                if scores[2] == 3:
+                    landlord_index = 2
+                    print("玩家3叫3分，直接成为地主")
+        
+        if landlord_index == -1:
+            max_score = max(scores)
+            
+            if max_score == 0:
+                print("所有玩家都不叫地主，重新发牌并重新开始叫分")
+                continue
+            
+            if scores[2] == max_score:
+                landlord_index = 2
+            elif scores[1] == max_score:
+                landlord_index = 1
+            else:
+                landlord_index = 0
+        
+        print(f"地主牌是: {remain_card}")
+        if landlord_index == 0:
+            player1.extend(remain_card)
+            player1 = sort(player1)
+            print("玩家1是地主")
+        elif landlord_index == 1:
+            player2.extend(remain_card)
+            player2 = sort(player2)
+            print("玩家2是地主")
+        else:
+            player3.extend(remain_card)
+            player3 = sort(player3)
+            print("玩家3是地主")
+        
+        return (player1, player2, player3, landlord_index)
+
+def circle_abandon_card():
+    poker = create_poker()
+    poker = shuffle_poker(poker)
+    player1, player2, player3, remain_card = deal_poker(poker)
+    player1 = sort(player1)
+    player2 = sort(player2)
+    player3 = sort(player3)
+    remain_card = sort(remain_card)
     
-    # 处理空输入
-    if cards1_input.strip() == "":
-        cards1 = None
-    else:
-        cards1 = cards1_input.split()
+    # 接收4个返回值
+    player1, player2, player3, landlord_index = landlord_choose()
     
-    if cards2_input.strip() == "":
-        cards2 = None
-    else:
-        cards2 = cards2_input.split()
+    players = [player1, player2, player3]
+    player_names = ["玩家1", "玩家2", "玩家3"]
     
-    # 比较牌型
-    result = compare_cards(cards1, cards2)
+    # 地主先出牌
+    current_player = landlord_index
+    print(f"游戏开始！{player_names[current_player]}（地主）先出牌")
     
-    # 输出结果
-    if result is None:
-        print("无法比较这两手牌")
-    elif result == 1:
-        print("第一手牌比第二手牌大")
-    elif result == -1:
-        print("第二手牌比第一手牌大")
-    else:
-        print("两手牌一样大")
+    last_valid_cards = None
+    consecutive_passes = 0
+    game_over = False
+    
+    while not game_over:
+        print(f"\n{player_names[current_player]}的手牌: {players[current_player]}")
+        
+        if last_valid_cards is None:
+            print("你可以出任意牌型（输入'pass'表示不出）")
+        else:
+            last_type = get_card_value(last_valid_cards)[0]
+            print(f"上一手牌: {last_valid_cards}，牌型: {last_type}")
+            print("请出大于上一手的牌或输入'pass'表示不出")
+        
+        valid_input = False
+        while not valid_input:
+            choice = input("请选择要出的牌（用空格分隔）或输入'pass': ").strip()
+            
+            if choice.lower() == 'pass':
+                print(f"{player_names[current_player]}选择不出")
+                consecutive_passes += 1
+                
+                if consecutive_passes >= 2:
+                    print("连续两家不出，重新开始出牌轮")
+                    last_valid_cards = None
+                    consecutive_passes = 0
+                
+                valid_input = True
+                break
+            
+            cards_to_play = choice.split()
+            
+            invalid_cards = [card for card in cards_to_play if card not in card_value]
+            if invalid_cards:
+                print(f"错误：这些牌不是合法的牌面: {', '.join(invalid_cards)}")
+                print("请重新输入或输入'pass'表示不出")
+                continue
+            
+            player_hand = players[current_player][:]
+            missing_cards = []
+            for card in cards_to_play:
+                if card in player_hand:
+                    player_hand.remove(card)
+                else:
+                    missing_cards.append(card)
+            
+            if missing_cards:
+                print(f"错误：你没有这些牌: {', '.join(missing_cards)}")
+                print("请重新输入或输入'pass'表示不出")
+                continue
+            
+            card_type = get_card_value(cards_to_play)
+            if card_type is None:
+                print("不合法的牌型组合")
+                print("请重新输入或输入'pass'表示不出")
+                continue
+            
+            if last_valid_cards is not None:
+                comparison = compare_cards(cards_to_play, last_valid_cards)
+                if comparison != 1:
+                    if comparison == 0:
+                        print("错误：不能出和上一手牌一样大的牌")
+                    else:
+                        print("错误：不能出比上一手牌小的牌")
+                    print("请重新输入或输入'pass'表示不出")
+                    continue
+            
+            for card in cards_to_play:
+                players[current_player].remove(card)
+            
+            print(f"{player_names[current_player]}出牌: {cards_to_play}，牌型: {card_type[0]}")
+            last_valid_cards = cards_to_play
+            consecutive_passes = 0
+            valid_input = True
+            
+            if len(players[current_player]) == 0:
+                print(f"\n{player_names[current_player]}出完所有牌，游戏结束！")
+                game_over = True
+                break
+        
+        if game_over:
+            break
+        
+        current_player = (current_player + 1) % 3
 
 if __name__ == '__main__':
-    reveal_cards()
-
+    circle_abandon_card()
